@@ -7,6 +7,9 @@ const selectedCategory = ref(''); // 使用者選擇的分類
 const filteredIngredients = ref([]); // 選取分類後過濾的食材
 const selectedIngredientId = ref(null); // 儲存選擇的食材 ID
 const foodtype = ref('');
+const isFoodModalVisible = ref(false);
+const isCreateGroupModalVisible = ref(false);
+const isChangeGroupModalVisible = ref(false);
 
 // 定義一個響應式變數 username，儲存使用者名稱
 const username = ref('');
@@ -15,7 +18,7 @@ const username = ref('');
 const storedUserData = JSON.parse(localStorage.getItem('UserData'));
 console.log(storedUserData);
 // 定義選單項目，包含標籤名稱；activeIndex 將會控制選擇的項目
-const menuItems = ref(['基本資料', '飲食偏好', '群組', '自訂食譜']);
+const menuItems = ref(['基本資料', '飲食偏好', '群組']);
 
 const activeIndex = ref(-1);
 
@@ -191,6 +194,7 @@ const addFoot = ref({
 const API_URL_IngredientsAdd = ref('');
 const preferIngredientModal = (prefer) => {
     foodtype.value = '偏好食材';
+    isFoodModalVisible.value = true;
     API_URL_IngredientsAdd.value = `${import.meta.env.VITE_API_BASEURL}/UserIngredients/PreferedIngredientsAdd`;
     selectedCategory.value = ''; // 使用者選擇的分類
     filteredIngredients.value = []; // 選取分類後過濾的食材
@@ -198,6 +202,7 @@ const preferIngredientModal = (prefer) => {
 };
 const exclusiveIngredientModal = (exclusive) => {
     foodtype.value = '不可食用食材';
+    isFoodModalVisible.value = true;
     API_URL_IngredientsAdd.value = `${import.meta.env.VITE_API_BASEURL}/UserIngredients/ExclusiveIngredientsAdd`;
     selectedCategory.value = ''; // 使用者選擇的分類
     filteredIngredients.value = []; // 選取分類後過濾的食材
@@ -226,6 +231,7 @@ const sendAddIngredientModal = async () => {
                         .map((ingredient) => `${ingredient.preferIngredientId},"${ingredient.preferIngredientName}"`)
                         .join('\n');
                     localStorage.setItem('PreferIngredients', preferIngredientsFormatted);
+                    loadPreferIngredients();
                 }
             } else if (foodtype.value === '不可食用食材') {
                 const exclusiveIngredientsResponse = await fetch(
@@ -241,6 +247,7 @@ const sendAddIngredientModal = async () => {
                         )
                         .join('\n');
                     localStorage.setItem('ExclusiveIngredients', exclusiveIngredientsFormatted);
+                    loadExclusiveIngredients();
                 }
             }
         } else {
@@ -249,6 +256,8 @@ const sendAddIngredientModal = async () => {
         }
     } catch (error) {
         alert('新增請求失敗：' + error.message);
+    } finally {
+        isFoodModalVisible.value = false;
     }
 };
 
@@ -349,7 +358,7 @@ const sendchangeGroup = async () => {
             <div v-if="activeIndex === 0">
                 <h4 class="mt-5 text-center">您的基本資料</h4>
                 <form @submit.prevent="sendBasic">
-                    <div class="mt-3 w-60 mx-auto">
+                    <div class="mt-3 w-60 mx-auto min-vh-50">
                         <label for="name" class="fs-6">姓名</label>
                         <input
                             type="text"
@@ -383,14 +392,9 @@ const sendchangeGroup = async () => {
             <!-- 飲食偏好區塊內容 -->
             <div v-else-if="activeIndex === 1">
                 <h4 class="mt-5 text-center">您的飲食偏好</h4>
-                <div class="mt-3 w-60 mx-auto">
+                <div class="mt-3 w-60 mx-auto min-vh-50">
                     <h5>
-                        偏好食材<button
-                            class="add-button"
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal"
-                            @click="preferIngredientModal('prefer')"
-                        >
+                        偏好食材<button class="add-button" @click="preferIngredientModal('prefer')">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </h5>
@@ -398,26 +402,20 @@ const sendchangeGroup = async () => {
                         v-for="(item, index) in preferIngredientsArray"
                         :key="index"
                         :id="item.id"
-                        class="btn btn-info m-1"
+                        class="btn btn-sm btn-success m-1 px-3"
                         @click="handleButtonClick(item.id)"
                     >
                         {{ item.name }}
                         <!-- X 按鈕 -->
                         <button
-                            type="button"
-                            class="btn-close ms-2"
+                            class="btn-close ms-2 p-1"
                             aria-label="Close"
                             @click="handlePreDelete(item.id)"
                         ></button>
                     </span>
                     <span v-if="!preferIngredientsArray.length">目前無偏好食材</span>
                     <h5 class="mt-5">
-                        不可食用食材<button
-                            class="add-button"
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal"
-                            @click="exclusiveIngredientModal('exclusive')"
-                        >
+                        不可食用食材<button class="add-button" @click="exclusiveIngredientModal('exclusive')">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </h5>
@@ -425,16 +423,15 @@ const sendchangeGroup = async () => {
                         v-for="(item, index) in exclusiveIngredientsArray"
                         :key="index"
                         :id="item.id"
-                        class="btn btn-danger m-1"
+                        class="btn btn-sm btn-danger m-1 px-3"
                         @click="handleButtonClick(item.id)"
                     >
                         {{ item.name }}
                         <!-- X 按鈕 -->
                         <button
-                            type="button"
-                            class="btn-close ms-2"
+                            class="btn-close ms-2 p-1"
                             aria-label="Close"
-                            @click="handleEXDelete(item.id)"
+                            @click="handlePreDelete(item.id)"
                         ></button>
                     </span>
                     <span v-if="!exclusiveIngredientsArray.length">目前無偏好食材</span>
@@ -447,132 +444,119 @@ const sendchangeGroup = async () => {
                     <p class="group-text text-center">{{ storedUserData?.GroupId }}</p>
                     <p class="text-black text-center fs-6">是您目前的群組編號</p>
                     <div class="d-flex justify-content-center">
-                        <button
-                            class="btn bg-gradient-success m-1 fs-6"
-                            data-bs-toggle="modal"
-                            data-bs-target="#CreateGroupModal"
-                        >
+                        <button class="btn bg-gradient-success m-1 fs-6" @click="isCreateGroupModalVisible = true">
                             新增群組
                         </button>
-                        <button
-                            class="btn bg-gradient-success m-1 fs-6"
-                            data-bs-toggle="modal"
-                            data-bs-target="#changeGroupModal"
-                        >
+                        <button class="btn bg-gradient-success m-1 fs-6" @click="isChangeGroupModalVisible = true">
                             更換群組
                         </button>
                     </div>
-                </div>
-            </div>
-            <div v-else-if="activeIndex === 3">
-                <h4 class="mt-5 text-center">您的自訂食譜</h4>
-                <div class="mt-3 w-60 mx-auto">
-                    <p>自訂食譜</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 食材選擇 -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">新增{{ foodtype }}食材</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <!-- 分類選擇 -->
-                        <label for="categorySelect">選擇類別</label>
-                        <select id="categorySelect" v-model="selectedCategory" @change="filterIngredientsByCategory">
-                            <option value="">選擇類別</option>
-                            <option
-                                v-for="category in [...new Set(ingredients.map((i) => i.category))]"
-                                :key="category"
-                                :value="category"
-                            >
-                                {{ category }}
-                            </option>
-                        </select>
-
-                        <!-- 食材選擇 -->
-                        <label for="ingredientSelect">選擇食材</label>
-                        <select id="ingredientSelect" v-model="selectedIngredientId">
-                            <option value="">選擇食材</option>
-                            <option
-                                v-for="ingredient in filteredIngredients"
-                                :key="ingredient.ingredientId"
-                                :value="ingredient.ingredientId"
-                            >
-                                {{ ingredient.ingredientName }}
-                            </option>
-                        </select>
-
-                        <!-- 顯示選取的食材 ID -->
-                        <p>選取的食材 ID：{{ selectedIngredientId }}</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-                    <button type="submit" class="btn btn-primary" @click="sendAddIngredientModal">
-                        加入{{ foodtype }}食材
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- 創建群組 Modal -->
-    <div
-        class="modal fade"
-        id="CreateGroupModal"
-        tabindex="-1"
-        aria-labelledby="CreateGroupModalLabel"
-        aria-hidden="true"
+    <el-dialog
+        v-model="isFoodModalVisible"
+        width="50%"
+        center
+        :modal-append-to-body="true"
+        :append-to-body="true"
+        :z-index="1000"
     >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="CreateGroupModalLabel">新增群組</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label for="groupNameInput">群組名稱</label>
-                    <input type="text" id="groupNameInput" v-model="CreateGroup.group_name" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-                    <button type="button" class="btn btn-primary" @click="sendCreateGroup">創建群組</button>
-                </div>
+        <h5 class="text-center">新增{{ foodtype }}</h5>
+        <div class="bg-white rounded-4 p-3">
+            <div class="d-flex justify-content-center align-items-center pb-3">
+                <!-- 分類選擇 -->
+                <label for="categorySelect" class="fs-6 mt-2">選擇類別</label>
+                <select
+                    id="categorySelect"
+                    v-model="selectedCategory"
+                    @change="filterIngredientsByCategory"
+                    class="form-select mx-3 w-30 fs-6"
+                >
+                    <option value="">選擇類別</option>
+                    <option
+                        v-for="category in [...new Set(ingredients.map((i) => i.category))]"
+                        :key="category"
+                        :value="category"
+                    >
+                        {{ category }}
+                    </option>
+                </select>
+
+                <!-- 食材選擇 -->
+                <label for="ingredientSelect" class="fs-6 mt-2">選擇食材</label>
+                <select id="ingredientSelect" v-model="selectedIngredientId" class="form-select mx-3 w-30 fs-6">
+                    <option value="">選擇食材</option>
+                    <option
+                        v-for="ingredient in filteredIngredients"
+                        :key="ingredient.ingredientId"
+                        :value="ingredient.ingredientId"
+                    >
+                        {{ ingredient.ingredientName }}
+                    </option>
+                </select>
             </div>
         </div>
-    </div>
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary me-2" @click="sendAddIngredientModal">
+                加入{{ foodtype }}
+            </button>
+            <button class="btn btn-secondary" @click="isFoodModalVisible = false">關閉</button>
+        </div>
+    </el-dialog>
+
+    <!-- 創建群組 Modal -->
+    <el-dialog
+        v-model="isCreateGroupModalVisible"
+        width="50%"
+        center
+        :modal-append-to-body="true"
+        :append-to-body="true"
+        :z-index="1000"
+    >
+        <h5 class="text-center">新增群組</h5>
+        <div class="d-flex justify-content-center align-items-center pb-3">
+            <label for="groupNameInput" class="fs-6 mt-2">群組名稱</label>
+            <input
+                type="text"
+                id="groupNameInput"
+                v-model="CreateGroup.group_name"
+                class="form-control m-3 w-50 fs-6 text-center"
+            />
+        </div>
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary me-2" @click="sendCreateGroup">創建群組</button>
+            <button class="btn btn-secondary" @click="isCreateGroupModalVisible = false">關閉</button>
+        </div>
+    </el-dialog>
 
     <!-- 更換群組 Modal -->
-    <div
-        class="modal fade"
-        id="changeGroupModal"
-        tabindex="-1"
-        aria-labelledby="changeGroupModalLabel"
-        aria-hidden="true"
+    <el-dialog
+        v-model="isChangeGroupModalVisible"
+        width="50%"
+        center
+        :modal-append-to-body="true"
+        :append-to-body="true"
+        :z-index="1000"
     >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="changeGroupModalLabel">更換群組</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label for="groupNameInput">群組Id</label>
-                    <input type="text" id="groupNameInput" v-model="changeGroup.change_Group_Id" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-                    <button type="button" class="btn btn-primary" @click="sendchangeGroup">確認更換群組</button>
-                </div>
-            </div>
+        <h5 class="text-center">更換群組</h5>
+        <div class="d-flex justify-content-center align-items-center pb-3">
+            <label for="groupNameInput" class="fs-6 mt-2">群組ID</label>
+            <input
+                type="text"
+                id="groupNameInput"
+                v-model="changeGroup.change_Group_Id"
+                class="form-control m-3 w-50 fs-6 text-center"
+            />
         </div>
-    </div>
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-primary me-2" @click="sendchangeGroup">確認更換群組</button>
+            <button type="button" class="btn btn-secondary" @click="isChangeGroupModalVisible = false">關閉</button>
+        </div>
+    </el-dialog>
 </template>
 
 <style lang="css" scoped>

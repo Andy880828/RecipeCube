@@ -65,6 +65,8 @@ const frequentlyUsedIngredients = ref([]);
 
 const isModalVisible = ref(false);
 
+const isLoading = ref(true);
+
 //控制食材Badge伸縮的boolean陣列
 const isIngredientExpanded = ref([]);
 
@@ -72,7 +74,9 @@ onMounted(async () => {
     await fetchIngredients();
     if (isLoggedIn.value) {
         //因為裡面是Promise物件要用async/await自動解構(相當於.then(result=>變數=result))
+        isLoading.value = true;
         frequentlyUsedIngredients.value = await getFrequentlyUsedIngredients(0.05);
+        isLoading.value = false;
     }
     isIngredientExpanded.value = [...ingredientCategory.value].map((c) => false);
 });
@@ -241,7 +245,19 @@ const handlePhotoUpload = (event) => {
                 <SwiperSlide v-if="isLoggedIn" class="nav-link category-item">
                     <h6 class="text-center">您的常用食材</h6>
                     <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <div v-if="isLoading" class="loader">
+                            <div class="square" id="sq1"></div>
+                            <div class="square" id="sq2"></div>
+                            <div class="square" id="sq3"></div>
+                            <div class="square" id="sq4"></div>
+                            <div class="square" id="sq5"></div>
+                            <div class="square" id="sq6"></div>
+                            <div class="square" id="sq7"></div>
+                            <div class="square" id="sq8"></div>
+                            <div class="square" id="sq9"></div>
+                        </div>
                         <span
+                            v-else
                             class="badge food-badge bg-secondary"
                             :class="{ active: isSelected(ingredient) }"
                             v-for="ingredient in frequentlyUsedIngredients"
@@ -542,5 +558,75 @@ const handlePhotoUpload = (event) => {
 .custom-scroll-container {
     max-height: 420px;
     overflow: hidden;
+}
+
+/* From Uiverse.io by JkHuger */
+@keyframes loader_5191 {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.square {
+    background: #ddd;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -5px;
+    margin-left: -5px;
+}
+
+#sq1 {
+    margin-top: -25px;
+    margin-left: -25px;
+    animation: loader_5191 675ms ease-in-out 0s infinite alternate;
+}
+
+#sq2 {
+    margin-top: -25px;
+    animation: loader_5191 675ms ease-in-out 75ms infinite alternate;
+}
+
+#sq3 {
+    margin-top: -25px;
+    margin-left: 15px;
+    animation: loader_5191 675ms ease-in-out 150ms infinite;
+}
+
+#sq4 {
+    margin-left: -25px;
+    animation: loader_5191 675ms ease-in-out 225ms infinite;
+}
+
+#sq5 {
+    animation: loader_5191 675ms ease-in-out 300ms infinite;
+}
+
+#sq6 {
+    margin-left: 15px;
+    animation: loader_5191 675ms ease-in-out 375ms infinite;
+}
+
+#sq7 {
+    margin-top: 15px;
+    margin-left: -25px;
+    animation: loader_5191 675ms ease-in-out 450ms infinite;
+}
+
+#sq8 {
+    margin-top: 15px;
+    animation: loader_5191 675ms ease-in-out 525ms infinite;
+}
+
+#sq9 {
+    margin-top: 15px;
+    margin-left: 15px;
+    animation: loader_5191 675ms ease-in-out 600ms infinite;
 }
 </style>

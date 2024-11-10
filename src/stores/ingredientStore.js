@@ -102,7 +102,7 @@ export const useIngredientStore = defineStore('ingredientStore', () => {
             }
 
             // 如果是克就undefine
-            if (targetIngredient.unit === '克' || '毫升') {
+            if (targetIngredient.unit === '克' || targetIngredient.unit === '毫升') {
                 return undefined;
             }
 

@@ -371,11 +371,11 @@ const ListClose = async () => {
                 <div class="text-center">
                     <h4>
                         您輸入了
-                        <span class="text-info text-gradient">{{ cookingInventories.length }}</span>
+                        <span class="text-success text-gradient">{{ cookingInventories.length }}</span>
                         樣食材<span v-if="isShowingString && isLoggedIn"
                             >，並決定
-                            <span v-if="isUsingInventory" class="text-info text-gradient">納入</span>
-                            <span v-else class="text-info text-gradient">不納入</span>
+                            <span v-if="isUsingInventory" class="text-success text-gradient">納入</span>
+                            <span v-else class="text-success text-gradient">不納入</span>
                             庫存食材一起檢索</span
                         >
                     </h4>

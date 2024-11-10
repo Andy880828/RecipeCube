@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import BannerRecipe from '@/assets/img/ForBackground/banner-recipe.jpg';
 import RecipeFilterComponent from '@/components/RecipeFilterComponent.vue';
 import RecipeDetailComponent from '@/components/RecipeDetailComponent.vue';
+import RecipeSkeleton from '@/components/RecipeSkeleton.vue';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import { useRouter } from 'vue-router';
@@ -28,12 +29,14 @@ const BaseUrlWithoutApi = BaseURL.replace('/api', ''); // 去掉 "/api" 得到�
 const recommendedRecipe = ref(null);
 const isRandomRecommend = ref(false); // 控制是否顯示重新推薦按鈕
 const UserId = localStorage.getItem('UserId'); // 從 localStorage 中取得 userId
-// 使用fetch獲取數據 (這段寫在recipeStore了)
+// 判斷是否在加載
+const isLoading = ref(true);
 
 // 在組件加載後獲取數據
-
 onMounted(async () => {
+    isLoading.value = true;
     await recipeStore.fetchRecipes();
+    isLoading.value = false;
 });
 
 const getRecipeImageUrl = (fileName) => {
@@ -325,9 +328,9 @@ const deleteRecipe = async (recipeId) => {
 
                             <!-- 分頁導航結束 -->
                         </div>
-
                         <div class="mt-1 row row-cols-1 row-cols-md-2 g-3">
-                            <div v-for="recipe in paginatedRecipes" :key="recipe.recipeId">
+                            <RecipeSkeleton v-if="isLoading"></RecipeSkeleton>
+                            <div v-else v-for="recipe in paginatedRecipes" :key="recipe.recipeId">
                                 <div
                                     class="card recipe-card shadow-sm rounded-3 d-flex flex-row align-items-center"
                                     @click="recipeStore.selectRecipe(recipe)"

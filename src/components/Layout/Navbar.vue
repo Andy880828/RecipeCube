@@ -199,4 +199,6 @@ const isNavbarShown = ref(false);
 const toggleNavbar = () => {
     isNavbarShown.value = !isNavbarShown.value;
 };
+localStorage.removeItem('LIFF_STORE:2006541501-jWaBEdv5:context');
+
 </script>

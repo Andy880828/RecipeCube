@@ -1,12 +1,19 @@
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useOAuthStore } from '@/stores/oauth';
+import { useOAuthLineStore } from '@/stores/oauthLine';
 const oauthStore = useOAuthStore();
+const oauthLineStore = useOAuthLineStore();
 const dietaryRestrictions = ref(false);
+const oAuthLineUserEmail = ref(localStorage.getItem('oAuthLineUserEmail')|| null);
 
 const handleLoginClick = async () => {
-    const loginSuccess = await oauthStore.oAuthFirstSignIn(dietaryRestrictions.value); // 先發送請求
+    if(oAuthLineUserEmail.value != null) {
+        const loginlineSuccess = await oauthLineStore.oAuthFirstSignIn(dietaryRestrictions.value); 
+    }
+    else {
+        const loginSuccess = await oauthStore.oAuthFirstSignIn(dietaryRestrictions.value); 
+    }
 };
 </script>
 

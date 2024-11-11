@@ -1,19 +1,23 @@
 <script setup>
-import { ref } from 'vue';
+import { ref , onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { useOAuthStore } from '@/stores/oauth';
+import { useAuthStore } from '@/stores/auth'; // 一般登入
+import { useOAuthStore } from '@/stores/oauth'; // Google登入
+import { useOAuthLineStore } from '@/stores/oauthLine'; // Line登入
 
 const router = useRouter();
 const authStore = useAuthStore();
 const oauthStore = useOAuthStore();
+const oauthLineStore = useOAuthLineStore();
 
 const user = ref({
     // 後續記得帳號功能，可以在按下記住密碼button後，將帳號密碼寫入localStorage，登入時讀取localStorage帳密，在tokin到期時一起清除
+    // 為了安全起見可以考慮，password欄位內容自動連接加密專用api(還沒寫)加密，私鑰存在後端api，後端解密後再進行hash，這樣localStorage儲存密碼安全性就會提高一點
     email: 'user18@example.com',
     password: 'Password123!',
 });
 
+// 一般登入
 const handleLoginClick = async () => {
     const loginSuccess = await authStore.login(user.value.email, user.value.password); // 先發送請求
     if (loginSuccess) {
@@ -22,9 +26,20 @@ const handleLoginClick = async () => {
     }
 };
 
+// Google oAuth取得 user jwt 回傳 oauth
 const handleGoogleLogin = async (response) => {
     oauthStore.callback(response);
 };
+
+// 處理 LINE 登入
+const handleLineLogin = () => {
+    oauthLineStore.handleLineLogin();
+};
+
+// 組件加載時初始化 LINE SDK
+onMounted(() => {
+    oauthLineStore.initializeLineSDK();
+});
 </script>
 
 <template>
@@ -37,6 +52,7 @@ const handleGoogleLogin = async (response) => {
                             <div class="card-header pb-0 bg-transparent mx-auto text-center">
                                 <h2 class="font-weight-bolder text-success text-gradient">歡迎回來</h2>
                                 <GoogleLogin :callback="handleGoogleLogin" class="mt-1" />
+                                <button class="linebutton w-100 mb-3 mb-0" @click="handleLineLogin">使用 LINE 登入</button>
                                 <p class="my-2">-或者-</p>
                                 <p class="mt-0 mb-2 fs-6">輸入Email與密碼登入</p>
                             </div>
@@ -132,5 +148,17 @@ const handleGoogleLogin = async (response) => {
     height: 80vh;
     border-radius: 2rem;
     object-fit: cover;
+}
+.linebutton {
+    padding: 10px 20px;
+    background-color: #00c300;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.linebutton:hover {
+    background-color: #009900;
 }
 </style>

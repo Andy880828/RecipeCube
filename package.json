@@ -12,6 +12,7 @@
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'"
   },
   "dependencies": {
+    "@line/liff": "^2.24.0",
     "animate.css": "^4.1.1",
     "circular-json": "^0.5.9",
     "echarts": "^5.5.1",

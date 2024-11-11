@@ -36,11 +36,14 @@ onMounted(() => {
     </section>
 
     <!-- 聲明 -->
-    <section class="mt-3">
+    <section class="mt-5">
         <div class="d-flex justify-content-center">
             <div class="text-center">
-                <p class="fs-4">此網頁僅供學習用途</p>
-                <p class="fs-4">This website is for educational purposes only.</p>
+                <p class="fs-4">此網頁僅供學習用途，所有圖片均來自網路資源，如有侵權將盡速撤銷</p>
+                <p class="fs-4">
+                    This website is for educational purposes only. All image are sourced from Internet, if there is any
+                    infringement, we will remove it ASAP.
+                </p>
             </div>
         </div>
     </section>
@@ -77,7 +80,7 @@ onMounted(() => {
                 <div class="offset-xl-1 col-md-6 col-lg-6 col-xl-2 wow fadeInUp" data-wow-delay="0.2s">
                     <div class="team-item">
                         <div class="team-img">
-                            <img src="@/assets/img/ForComponent/members/識齊.png" class="img-fluid" alt="" />
+                            <img src="@/assets/img/ForComponent/members/識齊.jpg" class="img-fluid" alt="" />
                         </div>
                         <div class="team-title">
                             <h4 class="mb-0">王識齊</h4>
@@ -125,7 +128,7 @@ onMounted(() => {
                 <div class="col-md-6 col-lg-6 col-xl-2 wow fadeInUp" data-wow-delay="0.8s">
                     <div class="team-item">
                         <div class="team-img">
-                            <img src="@/assets/img/ForComponent/members/家豐.png" class="img-fluid" alt="" />
+                            <img src="@/assets/img/ForComponent/members/家豐.jpg" class="img-fluid" alt="" />
                         </div>
                         <div class="team-title">
                             <h4 class="mb-0">宋家豐</h4>

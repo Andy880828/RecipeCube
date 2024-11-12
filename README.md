@@ -2,10 +2,6 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
-## 須知
-
-內建有SoftUI的component了，可以直接拿來用，使用可參考: (https://www.creative-tim.com/learning-lab/vue/badge/soft-ui-dashboard/)
-
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
@@ -30,11 +26,4 @@ npm run dev
 
 ```sh
 npm run build
-```
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
 ```

@@ -487,7 +487,7 @@ const ListClose = async () => {
                                     type="danger"
                                     class="position-absolute top-3 end-1"
                                 >
-                                    包含禁忌食材
+                                    包含不可食用食材
                                 </el-tag>
                                 <el-tag
                                     v-else-if="recipe.hasPreferred"
@@ -537,7 +537,7 @@ const ListClose = async () => {
                                     size="large"
                                     class="position-absolute top-3 end-1"
                                 >
-                                    包含禁忌食材
+                                    包含不可食用食材
                                 </el-tag>
                                 <el-tag
                                     v-else-if="recipe.hasPreferred"

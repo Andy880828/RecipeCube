@@ -46,16 +46,12 @@ const send = async () => {
     <div class="page-header align-items-start min-vh-100 pt-5 pb-11 m-3">
         <span class="mask bg-gradient-dark opacity-6"></span>
         <div class="container">
-            <div class="row justify-content-center">
+            <div v-if="!registrationSuccess" class="row justify-content-center">
                 <div class="col-lg-5 text-center mx-auto" style="color: white">
                     <h1 class="mb-2 mt-5 text-white">歡迎!</h1>
                     <p class="text-lead">填入資訊，快速成為會員!</p>
                 </div>
-            </div>
-        </div>
-    </div>
-    <template v-if="!registrationSuccess">
-        <form name="user" id="registerForm" class="registerForm blur" @submit.prevent="send" novalidate>
+                <form name="user" id="registerForm" class="registerForm blur" @submit.prevent="send" novalidate>
             <div class="form-floating mb-3">
                 <input type="email" v-model.trim="user.email" class="form-control" placeholder="Email" required />
                 <label>Email</label>
@@ -82,11 +78,16 @@ const send = async () => {
             <div class="text-center">
                 <button type="submit" class="btn bg-gradient-dark w-100">註冊</button>
             </div>
-        </form>
-    </template>
-    <template v-else>
-        <h2>註冊成功，請確認信箱</h2>
-    </template>
+                </form>
+            </div>
+            <div v-else class="row justify-content-center">
+                <div class="col-lg-5 text-center mx-auto" style="color: white">
+                    <h1 class="mb-2 mt-5 text-white">註冊完成!</h1>
+                    <p class="text-lead">請確認信箱，完成註冊驗證!</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style lang="css" scoped>

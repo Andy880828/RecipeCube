@@ -1,28 +1,22 @@
-# RecipeCube-FrontEnd
+# RecipeCube前端
 
-This template should help get you started developing with Vue 3 in Vite.
 
-## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+本專案使用Vite，可利用以下指令建置與執行。  
+(但如要完整執行，還需同時執行後端程式)
+## 建置
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### 開發環境
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+### 部署環境
 
 ```sh
 npm run build

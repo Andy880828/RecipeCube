@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', () => {
 
                         if (exclusiveIngredientsResponse.ok && exclusiveIngredientsGet.exclusiveIngredients.length > 0) {
                             const exclusiveIngredientsFormatted = exclusiveIngredientsGet.exclusiveIngredients
-                                .map(ingredient => `${ingredient.ingredientId},"${ingredient.exclusiveIngredientName},${ingredient.exclusiveIngredientId},"`)
+                                .map(ingredient => `${ingredient.ingredientId},"${ingredient.exclusiveIngredientName}",${ingredient.exclusiveIngredientId}`)
                                 .join('\n');
                             localStorage.setItem('ExclusiveIngredients', exclusiveIngredientsFormatted);
                         }
@@ -90,7 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
 
                         if (preferredIngredientsResponse.ok && preferredIngredientsGet.preferredIngredients.length > 0) {
                             const preferIngredientsFormatted = preferredIngredientsGet.preferredIngredients
-                                .map(ingredient => `${ingredient.ingredientId},"${ingredient.preferIngredientName},${ingredient.preferIngredientId},"`)
+                                .map(ingredient => `${ingredient.ingredientId},"${ingredient.preferIngredientName}",${ingredient.preferIngredientId}`)
                                 .join('\n');
                             localStorage.setItem('PreferIngredients', preferIngredientsFormatted);
                         }

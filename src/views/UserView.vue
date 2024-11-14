@@ -64,9 +64,9 @@ const loadPreferIngredients = () => {
     const preferIngredientsString = localStorage.getItem('PreferIngredients');
     preferIngredientsArray.value = preferIngredientsString
         ? preferIngredientsString.split('\n').map((item) => {
-              const parts = item.split(',');
-              return { id: parts[0], name: parts[1].replace(/"/g, '') };
-          })
+            const parts = item.split(',');
+            return { Ingredientsid: parts[0], name: parts[1], id: parts[2].replace(/"/g, '') };
+        })
         : [];
 };
 loadPreferIngredients();
@@ -75,9 +75,9 @@ const loadExclusiveIngredients = () => {
     const exclusiveIngredientsString = localStorage.getItem('ExclusiveIngredients');
     exclusiveIngredientsArray.value = exclusiveIngredientsString
         ? exclusiveIngredientsString.split('\n').map((item) => {
-              const parts = item.split(',');
-              return { id: parts[0], name: parts[1].replace(/"/g, '') };
-          })
+            const parts = item.split(',');
+            return { Ingredientsid: parts[0], name: parts[1], id: parts[2].replace(/"/g, '') };
+        })
         : [];
 };
 loadExclusiveIngredients();
@@ -87,12 +87,10 @@ const handleButtonClick = (id) => {
     console.log(`按鈕 ID: ${id} 被點擊`); // 你可以在這裡添加更多處理邏輯
 };
 
-const API_URL_ExclusiveIngredientsDelete = `${
-    import.meta.env.VITE_API_BASEURL
-}/UserIngredients/ExclusiveIngredientsDelete`;
-const API_URL_PreferedIngredientsDelete = `${
-    import.meta.env.VITE_API_BASEURL
-}/UserIngredients/PreferedIngrediensDelete`;
+const API_URL_ExclusiveIngredientsDelete = `${import.meta.env.VITE_API_BASEURL
+    }/UserIngredients/ExclusiveIngredientsDelete`;
+const API_URL_PreferedIngredientsDelete = `${import.meta.env.VITE_API_BASEURL
+    }/UserIngredients/PreferedIngrediensDelete`;
 
 // 刪除 API 呼叫
 const sendDelPreFood = async (ingredientId) => {
@@ -139,9 +137,9 @@ const sendDelEXFood = async (ingredientId) => {
 
 // 更新 localStorage 的方法
 const updateLocalStorage = () => {
-    const exingredientsString = exclusiveIngredientsArray.value.map((item) => `${item.id},"${item.name}"`).join('\n');
+    const exingredientsString = exclusiveIngredientsArray.value.map((item) => `${item.Ingredientsid},${item.name},${item.id}`).join('\n');
     localStorage.setItem('ExclusiveIngredients', exingredientsString);
-    const preingredientsString = preferIngredientsArray.value.map((item) => `${item.id},"${item.name}"`).join('\n');
+    const preingredientsString = preferIngredientsArray.value.map((item) => `${item.Ingredientsid},${item.name},${item.id}`).join('\n');
     localStorage.setItem('PreferIngredients', preingredientsString);
 };
 
@@ -228,7 +226,7 @@ const sendAddIngredientModal = async () => {
 
                 if (preferredIngredientsResponse.ok && preferredIngredientsGet.preferredIngredients.length > 0) {
                     const preferIngredientsFormatted = preferredIngredientsGet.preferredIngredients
-                        .map((ingredient) => `${ingredient.preferIngredientId},"${ingredient.preferIngredientName}"`)
+                        .map((ingredient) => `${ingredient.ingredientId},"${ingredient.preferIngredientName}",${ingredient.preferIngredientId}`)
                         .join('\n');
                     localStorage.setItem('PreferIngredients', preferIngredientsFormatted);
                     loadPreferIngredients();
@@ -243,7 +241,7 @@ const sendAddIngredientModal = async () => {
                     const exclusiveIngredientsFormatted = exclusiveIngredientsGet.exclusiveIngredients
                         .map(
                             (ingredient) =>
-                                `${ingredient.exclusiveIngredientId},"${ingredient.exclusiveIngredientName}"`
+                                `${ingredient.ingredientId},"${ingredient.exclusiveIngredientName}",${ingredient.exclusiveIngredientId}`
                         )
                         .join('\n');
                     localStorage.setItem('ExclusiveIngredients', exclusiveIngredientsFormatted);
@@ -337,15 +335,9 @@ const sendchangeGroup = async () => {
                 <!-- 使用 v-for 迴圈渲染選單項目 -->
                 <!-- 根據activeIndex 動態設定選單項目樣式 -->
                 <!-- ARIA 屬性幫助無障礙性 -->
-                <a
-                    v-for="(item, index) in menuItems"
-                    :key="index"
-                    href="#"
-                    class="list-group-item list-group-item-action"
-                    :class="{ active: activeIndex === index }"
-                    :aria-current="activeIndex === index ? 'true' : null"
-                    @click="setActive(index)"
-                >
+                <a v-for="(item, index) in menuItems" :key="index" href="#"
+                    class="list-group-item list-group-item-action" :class="{ active: activeIndex === index }"
+                    :aria-current="activeIndex === index ? 'true' : null" @click="setActive(index)">
                     <!-- 點擊事件，調用 setActive 函式 -->
                     {{ item }}
                 </a>
@@ -360,29 +352,15 @@ const sendchangeGroup = async () => {
                 <form @submit.prevent="sendBasic">
                     <div class="mt-3 w-60 mx-auto min-vh-50">
                         <label for="name" class="fs-6">姓名</label>
-                        <input
-                            type="text"
-                            class="form-control text-center"
-                            name="name"
-                            v-model="AccountSettings.userName"
-                            id="name"
-                            placeholder="姓名"
-                            required
-                        />
+                        <input type="text" class="form-control text-center" name="name"
+                            v-model="AccountSettings.userName" id="name" placeholder="姓名" required />
                         <label class="fs-6 mt-3">Email</label>
                         <p class="form-control text-center">
                             {{ storedUserData?.Email }}
                         </p>
                         <label for="phone" class="fs-6">電話</label>
-                        <input
-                            type="text"
-                            class="form-control text-center"
-                            name="phone"
-                            v-model="AccountSettings.phone"
-                            id="phone"
-                            placeholder="電話"
-                            required
-                        />
+                        <input type="text" class="form-control text-center" name="phone" v-model="AccountSettings.phone"
+                            id="phone" placeholder="電話" required />
                         <div class="text-center">
                             <button type="submit" class="btn bg-gradient-success w-100 mt-5 mb-4 fs-6">確認修改</button>
                         </div>
@@ -398,20 +376,12 @@ const sendchangeGroup = async () => {
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </h5>
-                    <span
-                        v-for="(item, index) in preferIngredientsArray"
-                        :key="index"
-                        :id="item.id"
-                        class="btn btn-sm btn-success m-1 px-3"
-                        @click="handleButtonClick(item.id)"
-                    >
+                    <span v-for="(item, index) in preferIngredientsArray" :key="index" :id="item.id"
+                        class="btn btn-sm btn-success m-1 px-3" @click="handleButtonClick(item.id)">
                         {{ item.name }}
                         <!-- X 按鈕 -->
-                        <button
-                            class="btn-close ms-2 p-1"
-                            aria-label="Close"
-                            @click="handlePreDelete(item.id)"
-                        ></button>
+                        <button class="btn-close ms-2 p-1" aria-label="Close"
+                            @click="handlePreDelete(item.id)"></button>
                     </span>
                     <span v-if="!preferIngredientsArray.length">目前無偏好食材</span>
                     <h5 class="mt-5">
@@ -419,20 +389,11 @@ const sendchangeGroup = async () => {
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </h5>
-                    <span
-                        v-for="(item, index) in exclusiveIngredientsArray"
-                        :key="index"
-                        :id="item.id"
-                        class="btn btn-sm btn-danger m-1 px-3"
-                        @click="handleButtonClick(item.id)"
-                    >
+                    <span v-for="(item, index) in exclusiveIngredientsArray" :key="index" :id="item.id"
+                        class="btn btn-sm btn-danger m-1 px-3" @click="handleButtonClick(item.id)">
                         {{ item.name }}
                         <!-- X 按鈕 -->
-                        <button
-                            class="btn-close ms-2 p-1"
-                            aria-label="Close"
-                            @click="handlePreDelete(item.id)"
-                        ></button>
+                        <button class="btn-close ms-2 p-1" aria-label="Close" @click="handleEXDelete(item.id)"></button>
                     </span>
                     <span v-if="!exclusiveIngredientsArray.length">目前無偏好食材</span>
                 </div>
@@ -457,31 +418,18 @@ const sendchangeGroup = async () => {
     </div>
 
     <!-- 食材選擇 -->
-    <el-dialog
-        v-model="isFoodModalVisible"
-        width="50%"
-        center
-        :modal-append-to-body="true"
-        :append-to-body="true"
-        :z-index="1000"
-    >
+    <el-dialog v-model="isFoodModalVisible" width="50%" center :modal-append-to-body="true" :append-to-body="true"
+        :z-index="1000">
         <h5 class="text-center">新增{{ foodtype }}</h5>
         <div class="bg-white rounded-4 p-3">
             <div class="d-flex justify-content-center align-items-center pb-3">
                 <!-- 分類選擇 -->
                 <label for="categorySelect" class="fs-6 mt-2">選擇類別</label>
-                <select
-                    id="categorySelect"
-                    v-model="selectedCategory"
-                    @change="filterIngredientsByCategory"
-                    class="form-select mx-3 w-30 fs-6"
-                >
+                <select id="categorySelect" v-model="selectedCategory" @change="filterIngredientsByCategory"
+                    class="form-select mx-3 w-30 fs-6">
                     <option value="">選擇類別</option>
-                    <option
-                        v-for="category in [...new Set(ingredients.map((i) => i.category))]"
-                        :key="category"
-                        :value="category"
-                    >
+                    <option v-for="category in [...new Set(ingredients.map((i) => i.category))]" :key="category"
+                        :value="category">
                         {{ category }}
                     </option>
                 </select>
@@ -490,11 +438,8 @@ const sendchangeGroup = async () => {
                 <label for="ingredientSelect" class="fs-6 mt-2">選擇食材</label>
                 <select id="ingredientSelect" v-model="selectedIngredientId" class="form-select mx-3 w-30 fs-6">
                     <option value="">選擇食材</option>
-                    <option
-                        v-for="ingredient in filteredIngredients"
-                        :key="ingredient.ingredientId"
-                        :value="ingredient.ingredientId"
-                    >
+                    <option v-for="ingredient in filteredIngredients" :key="ingredient.ingredientId"
+                        :value="ingredient.ingredientId">
                         {{ ingredient.ingredientName }}
                     </option>
                 </select>
@@ -509,23 +454,13 @@ const sendchangeGroup = async () => {
     </el-dialog>
 
     <!-- 創建群組 Modal -->
-    <el-dialog
-        v-model="isCreateGroupModalVisible"
-        width="50%"
-        center
-        :modal-append-to-body="true"
-        :append-to-body="true"
-        :z-index="1000"
-    >
+    <el-dialog v-model="isCreateGroupModalVisible" width="50%" center :modal-append-to-body="true"
+        :append-to-body="true" :z-index="1000">
         <h5 class="text-center">新增群組</h5>
         <div class="d-flex justify-content-center align-items-center pb-3">
             <label for="groupNameInput" class="fs-6 mt-2">群組名稱</label>
-            <input
-                type="text"
-                id="groupNameInput"
-                v-model="CreateGroup.group_name"
-                class="form-control m-3 w-50 fs-6 text-center"
-            />
+            <input type="text" id="groupNameInput" v-model="CreateGroup.group_name"
+                class="form-control m-3 w-50 fs-6 text-center" />
         </div>
         <div class="d-flex justify-content-center">
             <button class="btn btn-primary me-2" @click="sendCreateGroup">創建群組</button>
@@ -534,23 +469,13 @@ const sendchangeGroup = async () => {
     </el-dialog>
 
     <!-- 更換群組 Modal -->
-    <el-dialog
-        v-model="isChangeGroupModalVisible"
-        width="50%"
-        center
-        :modal-append-to-body="true"
-        :append-to-body="true"
-        :z-index="1000"
-    >
+    <el-dialog v-model="isChangeGroupModalVisible" width="50%" center :modal-append-to-body="true"
+        :append-to-body="true" :z-index="1000">
         <h5 class="text-center">更換群組</h5>
         <div class="d-flex justify-content-center align-items-center pb-3">
             <label for="groupNameInput" class="fs-6 mt-2">群組ID</label>
-            <input
-                type="text"
-                id="groupNameInput"
-                v-model="changeGroup.change_Group_Id"
-                class="form-control m-3 w-50 fs-6 text-center"
-            />
+            <input type="text" id="groupNameInput" v-model="changeGroup.change_Group_Id"
+                class="form-control m-3 w-50 fs-6 text-center" />
         </div>
         <div class="d-flex justify-content-center">
             <button type="button" class="btn btn-primary me-2" @click="sendchangeGroup">確認更換群組</button>
@@ -626,6 +551,7 @@ const sendchangeGroup = async () => {
     font-weight: 600;
     font-size: 1.5 rem;
 }
+
 .add-button:hover {
     color: #595959;
     /* 懸停時變色 */
@@ -637,6 +563,7 @@ const sendchangeGroup = async () => {
         background-color 0.2s;
     /* 添加平滑動畫 */
 }
+
 .group-text {
     color: #595959;
     font-weight: 600;

@@ -30,13 +30,12 @@ const send = async () => {
             body: JSON.stringify(user.value),
             headers: { 'Content-Type': 'application/json' },
         });
+        const data = await response.json();
         if (response.ok) {
             // alert('註冊成功，請確認信箱！');
             registrationSuccess.value = true;
-            alert(data.Message); // 顯示錯誤訊息
         } else {
-            const data = await response.json();
-            alert('email已被使用'); // 顯示錯誤訊息
+            alert(data.message); // 顯示錯誤訊息
         }
     }
 };
@@ -70,13 +69,13 @@ const send = async () => {
             <!-- 飲食偏好選擇 -->
             <div class="mb-2 form-check text-center">
                 <label class="form-check-label">
-                    <input type="checkbox" v-model="user.DietaryRestrictions" class="form-check-input" />
+                    <input type="checkbox" v-model="user.DietaryRestrictions" class="form-check-input" required/>
                     {{ user.DietaryRestrictions ? '素食' : '葷食' }}
                 </label>
             </div>
 
             <div class="text-center">
-                <button type="submit" class="btn bg-gradient-dark w-100">註冊</button>
+                <button class="btn bg-gradient-dark w-100">註冊</button>
             </div>
                 </form>
             </div>

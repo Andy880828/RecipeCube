@@ -96,7 +96,7 @@ onMounted(() => {
                 <div class="col-md-6 col-lg-6 col-xl-2 wow fadeInUp" data-wow-delay="0.4s">
                     <div class="team-item">
                         <div class="team-img">
-                            <img src="@/assets/img/ForComponent/members/柏霖.png" class="img-fluid" alt="" />
+                            <img src="@/assets/img/ForComponent/members/柏霖.jpg" class="img-fluid" alt="" />
                         </div>
                         <div class="team-title">
                             <h4 class="mb-0">蘇柏霖</h4>
@@ -112,7 +112,7 @@ onMounted(() => {
                 <div class="col-md-6 col-lg-6 col-xl-2 wow fadeInUp" data-wow-delay="0.6s">
                     <div class="team-item">
                         <div class="team-img">
-                            <img src="@/assets/img/ForComponent/members/維謙.png" class="img-fluid" alt="" />
+                            <img src="@/assets/img/ForComponent/members/維謙.jpg" class="img-fluid" alt="" />
                         </div>
                         <div class="team-title">
                             <h4 class="mb-0">洪維謙</h4>
@@ -144,7 +144,7 @@ onMounted(() => {
                 <div class="col-md-6 col-lg-6 col-xl-2 wow fadeInUp" data-wow-delay="1s">
                     <div class="team-item">
                         <div class="team-img">
-                            <img src="@/assets/img/ForComponent/members/敬勛.png" class="img-fluid" alt="" />
+                            <img src="@/assets/img/ForComponent/members/敬勛.jpg" class="img-fluid" alt="" />
                         </div>
                         <div class="team-title">
                             <h4 class="mb-0">林敬勛</h4>

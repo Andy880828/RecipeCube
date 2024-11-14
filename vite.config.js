@@ -24,7 +24,7 @@ export default defineConfig({
             key: fs.readFileSync(path.resolve(__dirname, 'certs', 'key.pem')), // 私鑰檔案路徑
             cert: fs.readFileSync(path.resolve(__dirname, 'certs', 'cert.pem')), // 憑證檔案路徑
         },
-        hmr: { host },
+        hmr: { host, protocol: 'wss' },
         host: host,
         port: 5173,
     },

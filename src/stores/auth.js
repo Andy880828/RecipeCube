@@ -107,6 +107,27 @@ export const useAuthStore = defineStore('auth', () => {
             return false; // 表示登入失敗
         }
     };
+    const API_URL_AccountSettings = `${import.meta.env.VITE_API_BASEURL}/Users/AccountSettings`;
+    const AccountSettings = async (user_Id, userName, phone) => {
+        const response = await fetch(API_URL_AccountSettings, {
+            method: 'PUT',
+            body: JSON.stringify({ user_Id, userName, phone }), // 將 AccountSettings 轉為 JSON 格式
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const data = await response.json();
+        console.log("data.userName", data.userName);
+        console.log("data.phoneNumber", data.phoneNumber);
+        if (response.ok) {
+            userData.value.UserName = data.userName;
+            userData.value.Phone = data.phoneNumber;
+            // 將更新後的 userData.value 存回 localStorage
+            localStorage.setItem('UserData', JSON.stringify(userData.value));
+            alert('修改成功！'); // 顯示成功訊息
+        } else {
+            const data = await response.json();
+            alert('修改失敗：' + data.Message); // 顯示錯誤訊息
+        }
+    };
     return {
         token,
         userData,
@@ -115,5 +136,6 @@ export const useAuthStore = defineStore('auth', () => {
         login,
         checkTokenExpiry,
         logout,
+        AccountSettings
     };
 });

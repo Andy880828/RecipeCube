@@ -8,7 +8,7 @@ const user = ref({
     password: '',
     DietaryRestrictions: false,
 });
-
+const signUpMessage = ref('');
 const registrationSuccess = ref(false);
 
 const pwd1 = ref('');
@@ -16,7 +16,7 @@ const pwd2 = ref('');
 
 const validatePasswords = () => {
     if (pwd1.value !== pwd2.value) {
-        alert('兩次輸入的密碼不一致');
+        signUpMessage.value = '兩次輸入的密碼不一致';
         return false;
     }
     return true;
@@ -35,7 +35,7 @@ const send = async () => {
             // alert('註冊成功，請確認信箱！');
             registrationSuccess.value = true;
         } else {
-            alert(data.message); // 顯示錯誤訊息
+            signUpMessage.value = data.message;
         }
     }
 };
@@ -79,7 +79,7 @@ const send = async () => {
                     </div>
 
                     <!-- 飲食偏好選擇 -->
-                    <div class="mb-2 form-check text-center">
+                    <div class="form-check text-center">
                         <label class="form-check-label">
                             <input
                                 type="checkbox"
@@ -90,7 +90,8 @@ const send = async () => {
                             {{ user.DietaryRestrictions ? '素食' : '葷食' }}
                         </label>
                     </div>
-
+                    <!-- 錯誤訊息 -->
+                    <small class="mb-2 form-check text-center text-danger">{{ signUpMessage }}</small>
                     <div class="text-center">
                         <button class="btn bg-gradient-dark w-100">註冊</button>
                     </div>

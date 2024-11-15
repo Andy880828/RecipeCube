@@ -1,6 +1,24 @@
 <script setup>
 // 引入 ref API，用來管理響應式狀態
 import { ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+const authStore = useAuthStore();
+
+// 存入使用者欲修改內容
+const newUserInfo = ref({
+        user_Id: authStore.userData.UserId, // 從 localStorage 中取得使用者ID
+        userName: authStore.userData.UserName, // 預設使用者名稱
+        phone: authStore.userData.Phone || '', // 預設使用者電話
+    });
+// 修改user基本資料
+const accountSettingsClick = async () => {
+    await authStore.AccountSettings(newUserInfo.value.user_Id, newUserInfo.value.userName, newUserInfo.value.phone); 
+};
+
+
+
+const isCreateGroupModalVisible = ref(false);
+const isChangeGroupModalVisible = ref(false);
 
 const ingredients = ref([]); // 存儲所有食材資料
 const selectedCategory = ref(''); // 使用者選擇的分類
@@ -8,15 +26,14 @@ const filteredIngredients = ref([]); // 選取分類後過濾的食材
 const selectedIngredientId = ref(null); // 儲存選擇的食材 ID
 const foodtype = ref('');
 const isFoodModalVisible = ref(false);
-const isCreateGroupModalVisible = ref(false);
-const isChangeGroupModalVisible = ref(false);
 
-// 定義一個響應式變數 username，儲存使用者名稱
-const username = ref('');
+
+const preferIngredientsArray = ref([]); // 儲存偏好食材
+const exclusiveIngredientsArray = ref([]); // 儲存不可食用食材
 
 // 從 localStorage 取得使用者資料並解析為 JSON，儲存到 storedUserData 中
 const storedUserData = JSON.parse(localStorage.getItem('UserData'));
-console.log(storedUserData);
+// console.log(storedUserData);
 // 定義選單項目，包含標籤名稱；activeIndex 將會控制選擇的項目
 const menuItems = ref(['基本資料', '飲食偏好', '群組']);
 
@@ -27,38 +44,7 @@ const setActive = (index) => {
     activeIndex.value = index; // 更新 activeIndex，根據點擊的項目
 };
 
-const AccountSettings = ref({
-    user_Id: storedUserData?.UserId, // 從 localStorage 中取得使用者ID
-    userName: storedUserData?.UserName || '', // 預設使用者名稱
-    phone: storedUserData?.Phone || '', // 預設使用者電話
-});
-// 發送請求的函式
-const sendBasic = async () => {
-    const response = await fetch(API_URL_AccountSettings, {
-        method: 'PUT',
-        body: JSON.stringify(AccountSettings.value), // 將 AccountSettings 轉為 JSON 格式
-        headers: { 'Content-Type': 'application/json' },
-    });
 
-    if (response.ok) {
-        const updatedUserData = {
-            ...storedUserData, // 保留其他資料
-            UserName: AccountSettings.value.userName, // 更新姓名
-            Phone: AccountSettings.value.phone, // 更新電話
-        };
-
-        // 更新 localStorage
-        localStorage.setItem('UserData', JSON.stringify(updatedUserData));
-        alert('修改成功！'); // 顯示成功訊息
-    } else {
-        const data = await response.json();
-        alert('修改失敗：' + data.Message); // 顯示錯誤訊息
-    }
-};
-
-const API_URL_AccountSettings = `${import.meta.env.VITE_API_BASEURL}/Users/AccountSettings`;
-const preferIngredientsArray = ref([]); // 儲存偏好食材
-const exclusiveIngredientsArray = ref([]); // 儲存不可食用食材
 
 const loadPreferIngredients = () => {
     const preferIngredientsString = localStorage.getItem('PreferIngredients');
@@ -84,7 +70,7 @@ loadExclusiveIngredients();
 
 // 處理按鈕點擊事件
 const handleButtonClick = (id) => {
-    console.log(`按鈕 ID: ${id} 被點擊`); // 你可以在這裡添加更多處理邏輯
+    // console.log(`按鈕 ID: ${id} 被點擊`); // 你可以在這裡添加更多處理邏輯
 };
 
 const API_URL_ExclusiveIngredientsDelete = `${import.meta.env.VITE_API_BASEURL
@@ -183,7 +169,7 @@ const filterIngredientsByCategory = () => {
     }
 };
 
-// 取值 (增加群組)
+// 取值 (增加食材)
 const addFoot = ref({
     user_Id: '',
     ingredient_Id: 0,
@@ -257,16 +243,19 @@ const sendAddIngredientModal = async () => {
     } finally {
         isFoodModalVisible.value = false;
     }
-};
+}
 
+const userGroupId = ref();
 // 取值 (建立群組)
 const groupName = ref(storedUserData?.UserName + '的群組');
 const CreateGroup = ref({
     group_name: groupName.value,
     group_Admin_Id: storedUserData?.UserId,
 });
+userGroupId.value = storedUserData?.GroupId;
 // 溝通API (建立群組)
-const API_URL_CreateGroup = `${import.meta.env.VITE_API_BASEURL}/UserGroups/CreateGroup`;
+const CreateGroupMessage = ref('');
+const API_URL_CreateGroup = `${import.meta.env.VITE_API_BASEURL}/Users/CreateGroup`;
 const sendCreateGroup = async () => {
     try {
         const response = await fetch(API_URL_CreateGroup, {
@@ -274,11 +263,46 @@ const sendCreateGroup = async () => {
             body: JSON.stringify(CreateGroup.value),
             headers: { 'Content-Type': 'application/json' },
         });
+        const data = await response.json();
         if (response.ok) {
-            alert('新增成功！');
+            CreateGroupMessage.value = data.message;
+            alert(CreateGroupMessage.value);
+            CreateGroupMessage.value = '';
         } else {
-            const data = await response.json();
-            alert('新增失敗：' + '已有群組');
+            CreateGroupMessage.value = data.message;
+        }
+    } catch (error) {
+        alert('新增請求失敗：' + error.message);
+    }
+};
+
+// 取值 (更換群組)
+const exitGroup = ref({
+    exit_user_Id: storedUserData?.UserId,
+    exit_Group_invite: '',
+});
+// 溝通API (退出群組)
+const ExitGroupMessage = ref('')
+const API_URL_ExitGroup = `${import.meta.env.VITE_API_BASEURL}/Users/ExitGroup`;
+const sendexitGroup = async () => {
+    try {
+        const response = await fetch(API_URL_ExitGroup, {
+            method: 'PUT',
+            body: JSON.stringify(changeGroup.value),
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            const updatedUserData = {
+                ...storedUserData, // 保留其他資料
+                GroupId: data.newGroupid, // 更新群組id
+            };
+            userGroupId.value = data.newGroupid;
+            // 更新 localStorage
+            localStorage.setItem('UserData', JSON.stringify(updatedUserData));
+            ExitGroupMessage.value = data.message;
+        } else {
+            ExitGroupMessage.value = data.message;
         }
     } catch (error) {
         alert('新增請求失敗：' + error.message);
@@ -288,10 +312,11 @@ const sendCreateGroup = async () => {
 // 取值 (更換群組)
 const changeGroup = ref({
     change_user_Id: storedUserData?.UserId,
-    change_Group_Id: storedUserData?.GroupId,
+    change_Group_invite: '',
 });
 // 溝通API (更換群組)
-const API_URL_ChangeGroup = `${import.meta.env.VITE_API_BASEURL}/Users/changeGroup`;
+const ChangeGroupMessage = ref('')
+const API_URL_ChangeGroup = `${import.meta.env.VITE_API_BASEURL}/Users/ChangeGroup`;
 const sendchangeGroup = async () => {
     try {
         const response = await fetch(API_URL_ChangeGroup, {
@@ -299,22 +324,24 @@ const sendchangeGroup = async () => {
             body: JSON.stringify(changeGroup.value),
             headers: { 'Content-Type': 'application/json' },
         });
+        const data = await response.json();
         if (response.ok) {
             const updatedUserData = {
                 ...storedUserData, // 保留其他資料
-                GroupId: changeGroup.value.change_Group_Id, // 更新群組id
+                GroupId: data.newGroupid, // 更新群組id
             };
+            userGroupId.value = data.newGroupid;
             // 更新 localStorage
             localStorage.setItem('UserData', JSON.stringify(updatedUserData));
-            alert('新增成功！');
+            ChangeGroupMessage.value = data.message;
         } else {
-            const data = await response.json();
-            alert('新增失敗：' + data.message);
+            ChangeGroupMessage.value = data.message;
         }
     } catch (error) {
         alert('新增請求失敗：' + error.message);
     }
 };
+
 </script>
 
 <template>
@@ -343,23 +370,22 @@ const sendchangeGroup = async () => {
                 </a>
             </div>
         </div>
-
         <!-- 右側內容區域 -->
         <div class="col-12 col-md-9 d-flex flex-column mx-auto">
             <!-- 根據 activeIndex 動態顯示對應的內容 -->
             <div v-if="activeIndex === 0">
                 <h4 class="mt-5 text-center">您的基本資料</h4>
-                <form @submit.prevent="sendBasic">
+                <form @submit.prevent="accountSettingsClick">
                     <div class="mt-3 w-60 mx-auto min-vh-50">
                         <label for="name" class="fs-6">姓名</label>
                         <input type="text" class="form-control text-center" name="name"
-                            v-model="AccountSettings.userName" id="name" placeholder="姓名" required />
+                            v-model="newUserInfo.userName" id="name" placeholder="姓名" required />
                         <label class="fs-6 mt-3">Email</label>
                         <p class="form-control text-center">
-                            {{ storedUserData?.Email }}
+                            {{ authStore.userData.Email }}
                         </p>
                         <label for="phone" class="fs-6">電話</label>
-                        <input type="text" class="form-control text-center" name="phone" v-model="AccountSettings.phone"
+                        <input type="text" class="form-control text-center" name="phone" v-model="newUserInfo.phone"
                             id="phone" placeholder="電話" required />
                         <div class="text-center">
                             <button type="submit" class="btn bg-gradient-success w-100 mt-5 mb-4 fs-6">確認修改</button>
@@ -402,7 +428,7 @@ const sendchangeGroup = async () => {
             <div v-else-if="activeIndex === 2">
                 <h4 class="mt-5 text-center">您的群組</h4>
                 <div class="mt-3 w-60 mx-auto">
-                    <p class="group-text text-center">{{ storedUserData?.GroupId }}</p>
+                    <p class="group-text text-center">{{ userGroupId }}</p>
                     <p class="text-black text-center fs-6">是您目前的群組編號</p>
                     <div class="d-flex justify-content-center">
                         <button class="btn bg-gradient-success m-1 fs-6" @click="isCreateGroupModalVisible = true">
@@ -457,11 +483,13 @@ const sendchangeGroup = async () => {
     <el-dialog v-model="isCreateGroupModalVisible" width="50%" center :modal-append-to-body="true"
         :append-to-body="true" :z-index="1000">
         <h5 class="text-center">新增群組</h5>
-        <div class="d-flex justify-content-center align-items-center pb-3">
+        <div class="d-flex justify-content-center align-items-center">
             <label for="groupNameInput" class="fs-6 mt-2">群組名稱</label>
             <input type="text" id="groupNameInput" v-model="CreateGroup.group_name"
                 class="form-control m-3 w-50 fs-6 text-center" />
+            <div class="text-center"></div>
         </div>
+        <small class="mb-2 form-check text-center text-danger">{{ CreateGroupMessage }}</small>
         <div class="d-flex justify-content-center">
             <button class="btn btn-primary me-2" @click="sendCreateGroup">創建群組</button>
             <button class="btn btn-secondary" @click="isCreateGroupModalVisible = false">關閉</button>
@@ -473,10 +501,11 @@ const sendchangeGroup = async () => {
         :append-to-body="true" :z-index="1000">
         <h5 class="text-center">更換群組</h5>
         <div class="d-flex justify-content-center align-items-center pb-3">
-            <label for="groupNameInput" class="fs-6 mt-2">群組ID</label>
-            <input type="text" id="groupNameInput" v-model="changeGroup.change_Group_Id"
+            <label for="groupNameInput" class="fs-6 mt-2">群組邀請碼</label>
+            <input type="text" id="groupNameInput" v-model.trim="changeGroup.change_Group_invite"
                 class="form-control m-3 w-50 fs-6 text-center" />
         </div>
+        <small class="mb-2 form-check text-center text-danger">{{ ChangeGroupMessage }}</small>
         <div class="d-flex justify-content-center">
             <button type="button" class="btn btn-primary me-2" @click="sendchangeGroup">確認更換群組</button>
             <button type="button" class="btn btn-secondary" @click="isChangeGroupModalVisible = false">關閉</button>

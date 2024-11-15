@@ -51,32 +51,49 @@ const send = async () => {
                     <p class="text-lead">填入資訊，快速成為會員!</p>
                 </div>
                 <form name="user" id="registerForm" class="registerForm blur" @submit.prevent="send" novalidate>
-            <div class="form-floating mb-3">
-                <input type="email" v-model.trim="user.email" class="form-control" placeholder="Email" required />
-                <label>Email</label>
-            </div>
+                    <div class="form-floating mb-3">
+                        <input
+                            type="email"
+                            v-model.trim="user.email"
+                            class="form-control"
+                            placeholder="Email"
+                            required
+                        />
+                        <label>Email</label>
+                    </div>
 
-            <div class="form-floating mb-3">
-                <input type="password" v-model.trim="pwd1" class="form-control" placeholder="密碼" required />
-                <label>密碼</label>
-            </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" v-model.trim="pwd1" class="form-control" placeholder="密碼" required />
+                        <label>密碼</label>
+                    </div>
 
-            <div class="form-floating mb-3">
-                <input type="password" v-model.trim="pwd2" class="form-control" placeholder="確認密碼" required />
-                <label>確認密碼</label>
-            </div>
+                    <div class="form-floating mb-3">
+                        <input
+                            type="password"
+                            v-model.trim="pwd2"
+                            class="form-control"
+                            placeholder="確認密碼"
+                            required
+                        />
+                        <label>確認密碼</label>
+                    </div>
 
-            <!-- 飲食偏好選擇 -->
-            <div class="mb-2 form-check text-center">
-                <label class="form-check-label">
-                    <input type="checkbox" v-model="user.DietaryRestrictions" class="form-check-input" required/>
-                    {{ user.DietaryRestrictions ? '素食' : '葷食' }}
-                </label>
-            </div>
+                    <!-- 飲食偏好選擇 -->
+                    <div class="mb-2 form-check text-center">
+                        <label class="form-check-label">
+                            <input
+                                type="checkbox"
+                                v-model="user.DietaryRestrictions"
+                                class="form-check-input"
+                                required
+                            />
+                            {{ user.DietaryRestrictions ? '素食' : '葷食' }}
+                        </label>
+                    </div>
 
-            <div class="text-center">
-                <button class="btn bg-gradient-dark w-100">註冊</button>
-            </div>
+                    <div class="text-center">
+                        <button class="btn bg-gradient-dark w-100">註冊</button>
+                    </div>
                 </form>
             </div>
             <div v-else class="row justify-content-center">
@@ -98,7 +115,7 @@ const send = async () => {
 }
 .registerForm {
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     width: 40%;
     transform: translate(-50%, -50%);
@@ -109,7 +126,7 @@ const send = async () => {
 }
 @media (max-width: 639px) {
     .registerForm {
-        top: 40%;
+        top: 55%;
         width: 60%;
     }
 }

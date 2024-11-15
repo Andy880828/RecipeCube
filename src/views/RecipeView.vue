@@ -335,17 +335,17 @@ const deleteRecipe = async (recipeId) => {
                                     class="card recipe-card shadow-sm rounded-3 d-flex flex-row align-items-center"
                                     @click="recipeStore.selectRecipe(recipe)"
                                 >
-                                    <span class="position-absolute top-0 end-0 z-index-3">
+                                    <span class="position-absolute top-3 end-2 z-index-3">
                                         <button
                                             v-if="showCustomRecipes"
-                                            class="edit-button btn btn-outline-secondary card-control"
+                                            class="card-control me-2"
                                             @click.stop="editCustomRecipe(recipe.recipeId)"
                                         >
                                             <i class="fa-solid fa-pencil"></i>
                                         </button>
                                         <button
                                             v-if="showCustomRecipes"
-                                            class="edit-button btn btn-outline-secondary card-control"
+                                            class="card-control"
                                             @click.stop="alertDeleteCheck(recipe.recipeId)"
                                         >
                                             <i class="fa-solid fa-trash"></i>
@@ -513,11 +513,15 @@ const deleteRecipe = async (recipeId) => {
     color: #41b883 !important;
 }
 .card-control {
-    color: red;
     cursor: pointer;
     background: transparent;
     border: none;
-    padding: 10px 20px 10px 20px;
+    padding: 0 3px 0 3px;
+}
+
+.card-control i {
+    font-size: 50px !important;
+    color: #000000 !important;
 }
 
 .card-control:hover {

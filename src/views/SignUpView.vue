@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Users/SignUp`;
 
@@ -14,28 +14,34 @@ const registrationSuccess = ref(false);
 const pwd1 = ref('');
 const pwd2 = ref('');
 
-const validatePasswords = () => {
+const validatePasswords = computed(() => {
     if (pwd1.value !== pwd2.value) {
         signUpMessage.value = '兩次輸入的密碼不一致';
         return false;
     }
     return true;
-};
+});
 
 const send = async () => {
-    if (validatePasswords()) {
-        user.value.password = pwd1.value; // 將密碼存入 user 對象
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(user.value),
-            headers: { 'Content-Type': 'application/json' },
-        });
-        const data = await response.json();
-        if (response.ok) {
-            // alert('註冊成功，請確認信箱！');
-            registrationSuccess.value = true;
-        } else {
-            signUpMessage.value = data.message;
+    if (validatePasswords) {
+        try {
+            user.value.password = pwd1.value;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(user.value),
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                registrationSuccess.value = true;
+            } else {
+                signUpMessage.value = data.message || '伺服器發生錯誤';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            signUpMessage.value = '網路連線發生問題';
         }
     }
 };

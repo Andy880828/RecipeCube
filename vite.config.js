@@ -4,8 +4,6 @@ import vue from '@vitejs/plugin-vue';
 import fs from 'fs';
 import path from 'path';
 
-const host = 'localhost';
-
 // 確保憑證檔案存在的函數
 function getCertificates() {
     const certPath = path.resolve(__dirname, 'certs');
@@ -36,13 +34,12 @@ export default defineConfig({
     },
     base: '/',
     server: {
-        https: getCertificates(),
-        host,
+        https: getCertificates(), // 使用本地證書啟用 HTTPS
+        host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host,
-            protocol: 'wss', // 使用 WSS for HMR
+            host: 'chlinandys.com',
+            protocol: 'wss',
         },
-        cors: true,
     },
 });

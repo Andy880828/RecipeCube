@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
 import { useIngredientStore } from './ingredientStore';
 import { usePantryStore } from './pantryStore';
@@ -16,19 +16,24 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
     const authStore = useAuthStore();
     const oauthStore = useOAuthStore();
     const oauthLineStore = useOAuthLineStore();
+    const { userData: authUserData } = storeToRefs(authStore);
+    const { userData: oauthUserData } = storeToRefs(oauthStore);
+    const { userData: oauthLineUserData } = storeToRefs(oauthLineStore);
 
-    const userId = ref(null);
-    const groupId = ref(null);
     const inventories = ref([]); //庫存放這
     const ingredientCategory = ref(new Set()); //分類放這，用Set避免重複
 
+    const currentUserId = computed(
+        () => authUserData.value?.UserId || oauthUserData.value?.UserId || oauthLineUserData.value?.UserId
+    );
+
+    const currentGroupId = computed(
+        () => authUserData.value?.GroupId || oauthUserData.value?.GroupId || oauthLineUserData.value?.GroupId
+    );
+
     const fetchInventories = async () => {
         try {
-            userId.value =
-                authStore.userData.value.UserId ||
-                oauthStore.userData.value.UserId ||
-                oauthLineStore.userData.value.UserId;
-            const InventoriesURL = `${inventoryApiURL}/${userId.value}`;
+            const InventoriesURL = `${inventoryApiURL}/${currentUserId}`;
             const response = await fetch(InventoriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -57,12 +62,6 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
 
     const postInventory = async ({ ingredientId, quantity, expiryDate, visibility }) => {
         // 在函數內部處理預設值
-        userId.value =
-            authStore.userData.value.UserId || oauthStore.userData.value.UserId || oauthLineStore.userData.value.UserId;
-        groupId.value =
-            authStore.userData.value.GroupId ||
-            oauthStore.userData.value.GroupId ||
-            oauthLineStore.userData.value.GroupId;
         const finalExpiryDate = expiryDate ?? (await getDefaultExpiryDate(ingredientId));
         const finalVisibility = visibility ?? false;
 
@@ -74,8 +73,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
                 },
                 body: JSON.stringify({
                     InventoryId: 0,
-                    GroupId: groupId,
-                    UserId: userId,
+                    GroupId: currentGroupId,
+                    UserId: currentUserId,
                     IngredientId: ingredientId,
                     Quantity: quantity,
                     ExpiryDate: finalExpiryDate,

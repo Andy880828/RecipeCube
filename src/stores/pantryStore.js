@@ -13,18 +13,23 @@ export const usePantryStore = defineStore('pantryStore', () => {
     const authStore = useAuthStore();
     const oauthStore = useOAuthStore();
     const oauthLineStore = useOAuthLineStore();
+    const { userData: authUserData } = storeToRefs(authStore);
+    const { userData: oauthUserData } = storeToRefs(oauthStore);
+    const { userData: oauthLineUserData } = storeToRefs(oauthLineStore);
 
     const pantries = ref([]);
-    const userId = ref(null);
-    const groupId = ref(null);
+
+    const currentUserId = computed(
+        () => authUserData.value?.UserId || oauthUserData.value?.UserId || oauthLineUserData.value?.UserId
+    );
+
+    const currentGroupId = computed(
+        () => authUserData.value?.GroupId || oauthUserData.value?.GroupId || oauthLineUserData.value?.GroupId
+    );
 
     const fetchPantries = async () => {
         try {
-            userId.value =
-                authStore.userData.value.UserId ||
-                oauthStore.userData.value.UserId ||
-                oauthLineStore.userData.value.UserId;
-            const pantriesURL = `${pantryApiURL}/${userId.value}`;
+            const pantriesURL = `${pantryApiURL}/${currentUserId}`;
             const response = await fetch(pantriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -39,10 +44,6 @@ export const usePantryStore = defineStore('pantryStore', () => {
 
     const postPantry = async ({ userId, ownerId, ingredientId, quantity, action }) => {
         try {
-            groupId.value =
-                authStore.userData.value.GroupId ||
-                oauthStore.userData.value.GroupId ||
-                oauthLineStore.userData.value.GroupId;
             const finalOwnerId = ownerId ?? userId;
             const response = await fetch(pantryApiURL, {
                 method: 'POST',
@@ -52,7 +53,7 @@ export const usePantryStore = defineStore('pantryStore', () => {
                 body: JSON.stringify({
                     PantryId: 0,
                     UserId: userId,
-                    GroupId: groupId,
+                    GroupId: currentGroupId,
                     OwnerId: finalOwnerId,
                     IngredientId: ingredientId,
                     Quantity: quantity,

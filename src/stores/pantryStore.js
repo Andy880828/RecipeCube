@@ -5,9 +5,6 @@ import { useIngredientStore } from './ingredientStore';
 export const usePantryStore = defineStore('pantryStore', () => {
     const BaseURL = import.meta.env.VITE_API_BASEURL;
     const pantryApiURL = `${BaseURL}/PantryManagements`;
-    const userId = localStorage.getItem('UserId');
-    const groupId = localStorage.getItem('GroupId');
-    const pantriesURL = `${pantryApiURL}/${userId}`;
     const ingredientStore = useIngredientStore();
     const { fetchIngredient } = ingredientStore;
 
@@ -15,6 +12,8 @@ export const usePantryStore = defineStore('pantryStore', () => {
 
     const fetchPantries = async () => {
         try {
+            const userId = localStorage.getItem('UserId');
+            const pantriesURL = `${pantryApiURL}/${userId}`;
             const response = await fetch(pantriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -29,6 +28,8 @@ export const usePantryStore = defineStore('pantryStore', () => {
 
     const postPantry = async ({ userId, ownerId, ingredientId, quantity, action }) => {
         try {
+            const userId = localStorage.getItem('UserId');
+            const groupId = localStorage.getItem('GroupId');
             const finalOwnerId = ownerId ?? userId;
             const response = await fetch(pantryApiURL, {
                 method: 'POST',

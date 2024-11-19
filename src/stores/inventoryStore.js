@@ -22,18 +22,13 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
 
     const inventories = ref([]); //庫存放這
     const ingredientCategory = ref(new Set()); //分類放這，用Set避免重複
-
-    const currentUserId = computed(
-        () => authUserData.value?.UserId || oauthUserData.value?.UserId || oauthLineUserData.value?.UserId
-    );
-
-    const currentGroupId = computed(
-        () => authUserData.value?.GroupId || oauthUserData.value?.GroupId || oauthLineUserData.value?.GroupId
-    );
+    const userId = ref(null);
+    const groupId = ref(null);
 
     const fetchInventories = async () => {
         try {
-            const InventoriesURL = `${inventoryApiURL}/${currentUserId}`;
+            userId.value = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
+            const InventoriesURL = `${inventoryApiURL}/${userId.value}`;
             const response = await fetch(InventoriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -64,6 +59,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
         // 在函數內部處理預設值
         const finalExpiryDate = expiryDate ?? (await getDefaultExpiryDate(ingredientId));
         const finalVisibility = visibility ?? false;
+        userId.value = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
+        groupId.value = authUserData.value.GroupId || oauthUserData.value.GroupId || oauthLineUserData.value.GroupId;
 
         try {
             const response = await fetch(inventoryApiURL, {
@@ -73,8 +70,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
                 },
                 body: JSON.stringify({
                     InventoryId: 0,
-                    GroupId: currentGroupId,
-                    UserId: currentUserId,
+                    GroupId: groupId.value,
+                    UserId: userId.value,
                     IngredientId: ingredientId,
                     Quantity: quantity,
                     ExpiryDate: finalExpiryDate,

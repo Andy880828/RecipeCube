@@ -22,11 +22,11 @@ export const useAuthStore = defineStore('auth', () => {
     // 客服email
     const Contact = 'shipumofangkefu@gmail.com';
     const checkTokenExpiry = () => {
-        const currentTime = Math.floor(Date.now() / 1000) //取的以秒為單位的目前時間
+        const currentTime = Math.floor(Date.now() / 1000); //取的以秒為單位的目前時間
         if (userData.value?.Exp && userData.value.Exp < currentTime) {
             logout(); // token 已過期，進行登出
         }
-    }
+    };
     const logout = () => {
         token.value = null;
         userData.value = null;
@@ -69,12 +69,20 @@ export const useAuthStore = defineStore('auth', () => {
                 localStorage.setItem('GroupId', userData.value.GroupId);
                 if (userData.value.ExclusiveChecked) {
                     try {
-                        const exclusiveIngredientsResponse = await fetch(`${import.meta.env.VITE_API_BASEURL}/UserIngredients/ExclusiveIngredientsName?User_Id=${userData.value.UserId}`);
+                        const exclusiveIngredientsResponse = await fetch(
+                            `${import.meta.env.VITE_API_BASEURL}/UserIngredients/ExclusiveIngredientsName?User_Id=${userData.value.UserId}`
+                        );
                         const exclusiveIngredientsGet = await exclusiveIngredientsResponse.json();
 
-                        if (exclusiveIngredientsResponse.ok && exclusiveIngredientsGet.exclusiveIngredients.length > 0) {
+                        if (
+                            exclusiveIngredientsResponse.ok &&
+                            exclusiveIngredientsGet.exclusiveIngredients.length > 0
+                        ) {
                             const exclusiveIngredientsFormatted = exclusiveIngredientsGet.exclusiveIngredients
-                                .map(ingredient => `${ingredient.ingredientId},"${ingredient.exclusiveIngredientName}",${ingredient.exclusiveIngredientId}`)
+                                .map(
+                                    (ingredient) =>
+                                        `${ingredient.ingredientId},"${ingredient.exclusiveIngredientName}",${ingredient.exclusiveIngredientId}`
+                                )
                                 .join('\n');
                             localStorage.setItem('ExclusiveIngredients', exclusiveIngredientsFormatted);
                         }
@@ -85,12 +93,20 @@ export const useAuthStore = defineStore('auth', () => {
                 // 根據 PreferredChecked 呼叫 API
                 if (userData.value.PreferredChecked) {
                     try {
-                        const preferredIngredientsResponse = await fetch(`${import.meta.env.VITE_API_BASEURL}/UserIngredients/PreferedIngredientsName?User_Id=${userData.value.UserId}`);
+                        const preferredIngredientsResponse = await fetch(
+                            `${import.meta.env.VITE_API_BASEURL}/UserIngredients/PreferedIngredientsName?User_Id=${userData.value.UserId}`
+                        );
                         const preferredIngredientsGet = await preferredIngredientsResponse.json();
 
-                        if (preferredIngredientsResponse.ok && preferredIngredientsGet.preferredIngredients.length > 0) {
+                        if (
+                            preferredIngredientsResponse.ok &&
+                            preferredIngredientsGet.preferredIngredients.length > 0
+                        ) {
                             const preferIngredientsFormatted = preferredIngredientsGet.preferredIngredients
-                                .map(ingredient => `${ingredient.ingredientId},"${ingredient.preferIngredientName}",${ingredient.preferIngredientId}`)
+                                .map(
+                                    (ingredient) =>
+                                        `${ingredient.ingredientId},"${ingredient.preferIngredientName}",${ingredient.preferIngredientId}`
+                                )
                                 .join('\n');
                             localStorage.setItem('PreferIngredients', preferIngredientsFormatted);
                         }
@@ -115,8 +131,8 @@ export const useAuthStore = defineStore('auth', () => {
             headers: { 'Content-Type': 'application/json' },
         });
         const data = await response.json();
-        console.log("data.userName", data.userName);
-        console.log("data.phoneNumber", data.phoneNumber);
+        console.log('data.userName', data.userName);
+        console.log('data.phoneNumber', data.phoneNumber);
         if (response.ok) {
             userData.value.UserName = data.userName;
             userData.value.Phone = data.phoneNumber;
@@ -136,6 +152,6 @@ export const useAuthStore = defineStore('auth', () => {
         login,
         checkTokenExpiry,
         logout,
-        AccountSettings
+        AccountSettings,
     };
 });

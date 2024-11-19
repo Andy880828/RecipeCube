@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import { useIngredientStore } from './ingredientStore';
 import { useAuthStore } from './auth';
 import { useOAuthStore } from './oauth';
@@ -18,18 +18,13 @@ export const usePantryStore = defineStore('pantryStore', () => {
     const { userData: oauthLineUserData } = storeToRefs(oauthLineStore);
 
     const pantries = ref([]);
-
-    const currentUserId = computed(
-        () => authUserData.value?.UserId || oauthUserData.value?.UserId || oauthLineUserData.value?.UserId
-    );
-
-    const currentGroupId = computed(
-        () => authUserData.value?.GroupId || oauthUserData.value?.GroupId || oauthLineUserData.value?.GroupId
-    );
+    const userId = ref(null);
+    const groupId = ref(null);
 
     const fetchPantries = async () => {
         try {
-            const pantriesURL = `${pantryApiURL}/${currentUserId}`;
+            userId.value = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
+            const pantriesURL = `${pantryApiURL}/${userId.value}`;
             const response = await fetch(pantriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -45,6 +40,8 @@ export const usePantryStore = defineStore('pantryStore', () => {
     const postPantry = async ({ userId, ownerId, ingredientId, quantity, action }) => {
         try {
             const finalOwnerId = ownerId ?? userId;
+            groupId.value =
+                authUserData.value.GroupId || oauthUserData.value.GroupId || oauthLineUserData.value.GroupId;
             const response = await fetch(pantryApiURL, {
                 method: 'POST',
                 headers: {
@@ -53,7 +50,7 @@ export const usePantryStore = defineStore('pantryStore', () => {
                 body: JSON.stringify({
                     PantryId: 0,
                     UserId: userId,
-                    GroupId: currentGroupId,
+                    GroupId: groupId.value,
                     OwnerId: finalOwnerId,
                     IngredientId: ingredientId,
                     Quantity: quantity,

@@ -204,7 +204,6 @@ export const useOAuthStore = defineStore('oauth', () => {
         token,
         userData,
         oAuthGemail,
-        initializeStore,
         oAuthFirstSignIn,
         callback,
     };

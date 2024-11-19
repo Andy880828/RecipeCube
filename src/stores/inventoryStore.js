@@ -6,9 +6,6 @@ import { useCookingStore } from './cookingStore';
 export const useInventoryStore = defineStore('inventoryStore', () => {
     const BaseURL = import.meta.env.VITE_API_BASEURL;
     const inventoryApiURL = `${BaseURL}/Inventories`;
-    const userId = localStorage.getItem('UserId');
-    const groupId = localStorage.getItem('GroupId');
-    const InventoriesURL = `${inventoryApiURL}/${userId}`;
     const ingredientStore = useIngredientStore();
     const { getDefaultExpiryDate } = ingredientStore;
     const pantryStore = usePantryStore();
@@ -19,6 +16,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
 
     const fetchInventories = async () => {
         try {
+            const userId = localStorage.getItem('UserId');
+            const InventoriesURL = `${inventoryApiURL}/${userId}`;
             const response = await fetch(InventoriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -47,6 +46,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
 
     const postInventory = async ({ ingredientId, quantity, expiryDate, visibility }) => {
         // 在函數內部處理預設值
+        const userId = localStorage.getItem('UserId');
+        const groupId = localStorage.getItem('GroupId');
         const finalExpiryDate = expiryDate ?? (await getDefaultExpiryDate(ingredientId));
         const finalVisibility = visibility ?? false;
 

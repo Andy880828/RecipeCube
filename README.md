@@ -4,7 +4,8 @@
 技術上前端利用Vue3框架(Composition API)建構網站本體，Fetch串接後端Restful API，透過此與SQL server溝通。
 
 ## 試用
-目前我用Google Cloud部署在雲端VM，網址為https://chlinandys.com，圖片有壓縮過所以比較糊還請見諒。
+目前我用Google Cloud部署在雲端VM，網址為https://chlinandys.com  
+(圖片有壓縮過所以比較糊還請見諒。)
 
 ## 建置
 本專案使用Vite，可利用以下指令建置與執行。  

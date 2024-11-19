@@ -22,13 +22,11 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
 
     const inventories = ref([]); //庫存放這
     const ingredientCategory = ref(new Set()); //分類放這，用Set避免重複
-    const userId = ref(null);
-    const groupId = ref(null);
 
     const fetchInventories = async () => {
         try {
-            userId.value = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
-            const InventoriesURL = `${inventoryApiURL}/${userId.value}`;
+            const userId = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
+            const InventoriesURL = `${inventoryApiURL}/${userId}`;
             const response = await fetch(InventoriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -59,8 +57,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
         // 在函數內部處理預設值
         const finalExpiryDate = expiryDate ?? (await getDefaultExpiryDate(ingredientId));
         const finalVisibility = visibility ?? false;
-        userId.value = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
-        groupId.value = authUserData.value.GroupId || oauthUserData.value.GroupId || oauthLineUserData.value.GroupId;
+        const userId = localStorage.getItem('UserId');
+        const groupId = localStorage.getItem('GroupId');
 
         try {
             const response = await fetch(inventoryApiURL, {
@@ -70,8 +68,8 @@ export const useInventoryStore = defineStore('inventoryStore', () => {
                 },
                 body: JSON.stringify({
                     InventoryId: 0,
-                    GroupId: groupId.value,
-                    UserId: userId.value,
+                    GroupId: groupId,
+                    UserId: userId,
                     IngredientId: ingredientId,
                     Quantity: quantity,
                     ExpiryDate: finalExpiryDate,

@@ -18,13 +18,11 @@ export const usePantryStore = defineStore('pantryStore', () => {
     const { userData: oauthLineUserData } = storeToRefs(oauthLineStore);
 
     const pantries = ref([]);
-    const userId = ref(null);
-    const groupId = ref(null);
 
     const fetchPantries = async () => {
         try {
-            userId.value = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
-            const pantriesURL = `${pantryApiURL}/${userId.value}`;
+            const userId = authUserData.value.UserId || oauthUserData.value.UserId || oauthLineUserData.value.UserId;
+            const pantriesURL = `${pantryApiURL}/${userId}`;
             const response = await fetch(pantriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -40,8 +38,7 @@ export const usePantryStore = defineStore('pantryStore', () => {
     const postPantry = async ({ userId, ownerId, ingredientId, quantity, action }) => {
         try {
             const finalOwnerId = ownerId ?? userId;
-            groupId.value =
-                authUserData.value.GroupId || oauthUserData.value.GroupId || oauthLineUserData.value.GroupId;
+            const groupId = localStorage.getItem('GroupId');
             const response = await fetch(pantryApiURL, {
                 method: 'POST',
                 headers: {
@@ -50,7 +47,7 @@ export const usePantryStore = defineStore('pantryStore', () => {
                 body: JSON.stringify({
                     PantryId: 0,
                     UserId: userId,
-                    GroupId: groupId.value,
+                    GroupId: groupId,
                     OwnerId: finalOwnerId,
                     IngredientId: ingredientId,
                     Quantity: quantity,

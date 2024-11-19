@@ -1,6 +1,6 @@
 // src/stores/oauth.js
 import { defineStore } from 'pinia';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const decodeJWT = (token) => {
@@ -17,20 +17,10 @@ const decodeJWT = (token) => {
 
 export const useOAuthStore = defineStore('oauth', () => {
     const oAuthGemail = ref(null);
-    const token = ref(null); // 初始 token
-    const userData = ref(null); // 初始使用者資料
+    const token = ref(null);
+    const userData = ref(null);
     const router = useRouter();
-    const loginMessage = ref('');
     const jwt = ref(null);
-
-    onMounted(() => {
-        initializeStore();
-    });
-
-    const initializeStore = () => {
-        token.value = localStorage.getItem('token') || null;
-        userData.value = JSON.parse(localStorage.getItem('UserData')) || null;
-    };
 
     const callback = async (response) => {
         if (response.credential) {
@@ -214,6 +204,7 @@ export const useOAuthStore = defineStore('oauth', () => {
         token,
         userData,
         oAuthGemail,
+        initializeStore,
         oAuthFirstSignIn,
         callback,
     };

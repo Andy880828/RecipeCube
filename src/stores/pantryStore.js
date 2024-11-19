@@ -1,19 +1,30 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { useIngredientStore } from './ingredientStore';
+import { useAuthStore } from './auth';
+import { useOAuthStore } from './oauth';
+import { useOAuthLineStore } from './oauthLine';
 
 export const usePantryStore = defineStore('pantryStore', () => {
     const BaseURL = import.meta.env.VITE_API_BASEURL;
     const pantryApiURL = `${BaseURL}/PantryManagements`;
     const ingredientStore = useIngredientStore();
     const { fetchIngredient } = ingredientStore;
+    const authStore = useAuthStore();
+    const oauthStore = useOAuthStore();
+    const oauthLineStore = useOAuthLineStore();
 
     const pantries = ref([]);
+    const userId = ref(null);
+    const groupId = ref(null);
 
     const fetchPantries = async () => {
         try {
-            const userId = localStorage.getItem('UserId');
-            const pantriesURL = `${pantryApiURL}/${userId}`;
+            userId.value =
+                authStore.userData.value.UserId ||
+                oauthStore.userData.value.UserId ||
+                oauthLineStore.userData.value.UserId;
+            const pantriesURL = `${pantryApiURL}/${userId.value}`;
             const response = await fetch(pantriesURL);
             if (!response.ok) {
                 throw new Error('網路連線有異常');
@@ -28,8 +39,10 @@ export const usePantryStore = defineStore('pantryStore', () => {
 
     const postPantry = async ({ userId, ownerId, ingredientId, quantity, action }) => {
         try {
-            const userId = localStorage.getItem('UserId');
-            const groupId = localStorage.getItem('GroupId');
+            groupId.value =
+                authStore.userData.value.GroupId ||
+                oauthStore.userData.value.GroupId ||
+                oauthLineStore.userData.value.GroupId;
             const finalOwnerId = ownerId ?? userId;
             const response = await fetch(pantryApiURL, {
                 method: 'POST',
